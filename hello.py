@@ -65,6 +65,7 @@ def text(text="None", scale=2, x=20, y=40, color=BLACK):
     g.append(text_group)
 
 text(text="more text",scale=2,x=45,y=70,color=LGREY)
+text(text="testing",scale=1,x=70,y=100,color=DGREY)
 
 
 # Place the display group on the screen
@@ -72,5 +73,10 @@ display.show(g)
 
 # Refresh the Eink display to show the new screen
 display.refresh()
+
 while display.busy:
     pass
+
+displayio.release_displays()
+spi.unlock()
+spi.deinit()  # Release IO36 SCK Pin
