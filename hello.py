@@ -51,6 +51,11 @@ palette[0] = BACKGROUND_COLOR
 t = displayio.TileGrid(background_bitmap, pixel_shader=palette)
 g.append(t)
 
+f = open("/10d.bmp", "rb")
+pic = displayio.OnDiskBitmap(f)
+t = displayio.TileGrid(pic, pixel_shader=displayio.ColorConverter(),x=0,y=0)
+g.append(t)
+
 # Draw simple text using the built-in font into a displayio group
 text_group = displayio.Group(max_size=10, scale=2, x=20, y=40)
 text = "Hello World!"
