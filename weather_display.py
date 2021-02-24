@@ -187,10 +187,10 @@ try:
     # Push Image to the Display
     write_to_display()
 
-    # Go to sleep for five minutes 
+    # Go to sleep for ten minutes 
     import alarm
     from time import monotonic
-    time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 300)
+    time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 600)
 
 finally: 
     displayio.release_displays() 
