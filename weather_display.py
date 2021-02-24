@@ -147,7 +147,7 @@ try:
 
     # Draw Icon Image
     icon = str(json_data['current']['weather'][0]['icon'])[:-1]  # Strip off the 'd' or 'n' since this is not a color display
-    #icon = '50'  # Test: 01 02 03 04 09 10 11 13 50
+    #icon = '50'  # Test Options: 01 02 03 04 09 10 11 13 50
     image = "/icons/" + icon + ".bmp"
     draw_image(image=image, x=182, y=12)
 
@@ -159,8 +159,8 @@ try:
     # Draw "Feels Like" Temperature
     feels_like = str(round(json_data['current']['feels_like'])) + chr(176)
     print("Feels Like:  ", feels_like)
-    draw_text(text='feels like',scale=1,x=200,y=95,color=BLACK)
-    draw_text(text=feels_like,scale=2,x=220,y=110,color=BLACK)
+    draw_text(text='feels like',scale=1,x=200,y=97,color=BLACK)
+    draw_text(text=feels_like,scale=2,x=220,y=112,color=BLACK)
 
     # Draw hourly forecast
     from time import localtime
@@ -187,8 +187,14 @@ try:
     # Push Image to the Display
     write_to_display()
 
+    # Go to sleep for five minutes 
+    import alarm
+    from time import monotonic
+    time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 300)
+
 finally: 
     displayio.release_displays() 
     spi.unlock()
     spi.deinit()  # Release IO36 SPI SCK Pin
+    alarm.exit_and_deep_sleep_until_alarms(time_alarm)  # If USB is connected it says "Pretending to deep sleep until alerm, CTRL+C or file write"
 
