@@ -29,8 +29,8 @@ display = adafruit_il0373.IL0373(
 )
 
 BLACK = 0x000000
-DGREY = 0x555555
-LGREY = 0xAAAAAA
+DGREY = 0x616163  # from panda_head.bmp test pattern
+LGREY = 0xABADB0  # From panda_head.bmp test pattern
 WHITE = 0xFFFFFF
 
 BACKGROUND_COLOR = WHITE
@@ -51,9 +51,9 @@ palette[0] = BACKGROUND_COLOR
 t = displayio.TileGrid(background_bitmap, pixel_shader=palette)
 g.append(t)
 
-f = open("/10d.bmp", "rb")
+f = open("/10d.bmp", "rb")  # 100x100 bitmap
 pic = displayio.OnDiskBitmap(f)
-t = displayio.TileGrid(pic, pixel_shader=displayio.ColorConverter(),x=0,y=0)
+t = displayio.TileGrid(pic, pixel_shader=displayio.ColorConverter(),x=182,y=14)
 g.append(t)
 
 # Draw simple text using the built-in font into a displayio group
