@@ -30,9 +30,9 @@
 #----------------------------------------------------------------
 
 # Board Specific Pins
-import board
-EPD_CS = board.IO1  # FeatherS2 to 2.9" E-Ink FeatherWing ECS pin
-EPD_DC = board.IO3  # FeatherS2 to 2.9" E-Ink FeatherWing DC pin
+from board import IO1,IO3,SCK,MOSI
+EPD_CS = IO1  # FeatherS2 to 2.9" E-Ink FeatherWing ECS pin
+EPD_DC = IO3  # FeatherS2 to 2.9" E-Ink FeatherWing DC pin
 
 # Display Dimensions
 DISPLAY_WIDTH  = 296
@@ -47,6 +47,7 @@ WHITE = 0xFFFFFF
 # Display Background Color
 BACKGROUND = LGREY
 
+
 #----------------------------------------------------------------
 # Display Initialization
 #----------------------------------------------------------------
@@ -58,13 +59,13 @@ displayio.release_displays()
 
 # Initialize SPI Display
 from busio import SPI
-spi = SPI(board.SCK, board.MOSI)  # Uses SCK and MOSI
+spi = SPI(SCK, MOSI) 
 display_bus = displayio.FourWire(
     spi, command=EPD_DC, chip_select=EPD_CS, baudrate=1000000
 )
 
 #from time import sleep
-#sleep(1)
+#sleep(1)  # Not sure why this was in original Adafruit example script
 
 from adafruit_il0373 import IL0373
 display = IL0373(
@@ -83,8 +84,6 @@ g = displayio.Group(max_size=10)
 
 # Set background color
 background_bitmap = displayio.Bitmap(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1)
-
-# Map colors in a palette
 palette = displayio.Palette(1)
 palette[0] = BACKGROUND
 
@@ -94,7 +93,7 @@ g.append(t)
 
 
 #----------------------------------------------------------------
-# Text Function
+# Draw Text Function
 #----------------------------------------------------------------
 
 from terminalio import FONT
@@ -107,7 +106,7 @@ def draw_text(text="None", scale=2, x=20, y=40, color=BLACK):
 
 
 #----------------------------------------------------------------
-# BMP Image Function
+# Draw BMP Image Function
 #----------------------------------------------------------------
 
 def draw_image(image="/icons/10.bmp", x=0, y=0):
@@ -118,31 +117,33 @@ def draw_image(image="/icons/10.bmp", x=0, y=0):
 
 
 #----------------------------------------------------------------
-# Display Text and Images on E-Ink Function 
+# Write Text and Images on E-Ink Display
 #----------------------------------------------------------------
 
 def write_to_display():
-    # Place the display group on the screen
+    # Place the display group in the screen buffer
     display.show(g)
 
     # Refresh the Eink display to show the new screen
     display.refresh()
 
     while display.busy:
-        pass
+        pass  # Don't Exit script before screen refresh finishes
 
 
 #----------------------------------------------------------------
 # Main Code Block
 #----------------------------------------------------------------
 try:
+    import openweathermap
+    json_data = openweathermap.pull_data()
+    feels_like = str(round(json_data['current']['feels_like'])) + chr(176) + 'F'
+    print("Feels Like:",feels_like)
     draw_image(image="/icons/10.bmp", x=182, y=14)
-    draw_text(text="Hello World!",scale=3,x=20,y=20,color=BLACK)
-    draw_text(text="more text",scale=2,x=45,y=70,color=LGREY)
-    draw_text(text="testing",scale=1,x=70,y=100,color=DGREY)
+    draw_text(text=feels_like,scale=3,x=20,y=20,color=BLACK)
     write_to_display()
-finally:
-    displayio.release_displays()
+finally: 
+    displayio.release_displays() 
     spi.unlock()
-    spi.deinit()  # Release IO36 SCK Pin
+    spi.deinit()  # Release IO36 SPI SCK Pin
 
