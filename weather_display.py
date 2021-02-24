@@ -18,11 +18,17 @@
 #     adafruit_display_text/ 
 #     adafruit_requests.mpy  <-- Used by openweathermap.py Module
 #
-# Create an /icons/ folder and populate it with OpenWeatherMap images:
+# OpenWeatherMap images:
 #    https://openweathermap.org/weather-conditions
+#    Convert PNG image to BMP example:
+#      * Open 01d@2x.png image in Gimp
+#      * Set 'Paint Fill' to ABADB0 (Light Grey)
+#      * Paint Fill the clear background 
+#      * File --> Export As.. ---> 01.bmp --> Advanced Options --> 16 bits R5 G6 B5
+#      * Copy 01.bmp image to CIRCUITPY/icons/
 #
-# Copy openweathermap.py to CIRCUITPY/
-# Copy this weather_display.py script to CIRCUITPY/code.py
+# Copy openweathermap.py  to CIRCUITPY/
+# Copy weather_display.py to CIRCUITPY/code.py
 #
 
 #----------------------------------------------------------------
@@ -140,7 +146,10 @@ try:
     json_data = openweathermap.pull_data()
 
     # Draw Icon Image
-    draw_image(image="/icons/10.bmp", x=182, y=14)
+    icon = str(json_data['current']['weather'][0]['icon'])[:-1]  # Strip off the 'd' or 'n' since this is not a color display
+    #icon = '50'  # Test: 01 02 03 04 09 10 11 13 50
+    image = "/icons/" + icon + ".bmp"
+    draw_image(image=image, x=182, y=12)
 
     # Draw Current Temperature
     temp = str(round(json_data['current']['temp'])) + chr(176)
