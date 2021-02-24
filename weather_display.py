@@ -137,11 +137,24 @@ def write_to_display():
 try:
     import openweathermap
     json_data = openweathermap.pull_data()
-    feels_like = str(round(json_data['current']['feels_like'])) + chr(176) + 'F'
-    print("Feels Like:",feels_like)
+
+    # Draw Icon Image
     draw_image(image="/icons/10.bmp", x=182, y=14)
-    draw_text(text=feels_like,scale=3,x=20,y=20,color=BLACK)
+
+    # Draw Current Temperature
+    temp = str(round(json_data['current']['temp'])) + chr(176) + 'F'
+    print("Current Temp:", temp)
+    draw_text(text=temp,scale=3,x=210,y=20,color=BLACK)
+
+    # Draw "Feels Like" Temperature
+    feels_like = str(round(json_data['current']['feels_like'])) + chr(176) + 'F'
+    print("Feels Like:  ", feels_like)
+    draw_text(text='feels like',scale=1,x=200,y=95,color=BLACK)
+    draw_text(text=feels_like,scale=2,x=215,y=110,color=BLACK)
+
+    # Push Image to the Display
     write_to_display()
+
 finally: 
     displayio.release_displays() 
     spi.unlock()
