@@ -153,19 +153,19 @@ try:
         icon = 'moon'
     else:
         icon = icon[:-1]  # Strip off the 'd' or 'n'
-    #icon = 'sun'  # Test Options: 01 02 03 04 09 10 11 13 50
+    #icon = '11'  # Test Options: sun moon 02 03 04 09 10 11 13 50
     image = "/icons/" + icon + ".bmp"
-    draw_image(image=image, x=182, y=12)
+    draw_image(image=image, x=196, y=12)
 
     # Draw Current Temperature
     temp = str(round(json_data['current']['temp'])) + chr(176)
     print("Current Temp:", temp)
-    draw_text(text=temp,scale=3,x=215,y=15,color=BLACK)
+    draw_text(text=temp,scale=3,x=232,y=15,color=BLACK)
 
     # Draw "Feels Like" Temperature
     feels_like = str(round(json_data['current']['feels_like'])) + chr(176)
-    draw_text(text='feels like',scale=1,x=200,y=97,color=BLACK)
-    draw_text(text=feels_like,scale=2,x=220,y=112,color=BLACK)
+    draw_text(text='feels like',scale=1,x=214,y=97,color=BLACK)
+    draw_text(text=feels_like,scale=2,x=234,y=112,color=BLACK)
 
     # Draw hourly forecast
     from time import localtime
@@ -192,6 +192,7 @@ try:
 
         # Draw Description
         description = str(json_data['hourly'][i]['weather'][0]['description'])
+        #description = 'thunderstorm with heavy drizzle'  # Longest text string
         draw_text(text=description,scale=1,x=description_x,y=forecast_y,color=BLACK)
         
         # Shift down for next hourly forecast line
