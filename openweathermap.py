@@ -1,6 +1,6 @@
 # Brandon Gant
 # Created: 2021-02-21
-# Updated: 2021-02-24
+# Updated: 2021-02-25
 #
 # Example secrets.py file:
 #    secrets = {
@@ -14,7 +14,7 @@
 # Example Usage:
 #    import openweathermap
 #    json_data = openweathermap.pull_data()
-#    print(json_data['current']['temp']
+#    print(json_data['current']['temp'])
 #
 
 # Function to connect to Wifi and pull down JSON data from OpenWeatherMap.org
