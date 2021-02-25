@@ -179,7 +179,11 @@ try:
             hour_12 = hour_24 - 12
         else:
             hour_12 = hour_24
-        hour_string = str(hour_12) + str("PM" if hour_24 > 12 else "AM")
+
+        if hour_12 is 0:
+            hour_string = '12AM'
+        else:
+            hour_string = str(hour_12) + str("PM" if hour_24 > 11 else "AM")
 
         # Line up hours on screen 
         if hour_12 > 9:
@@ -209,6 +213,9 @@ try:
         time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 25200) # Sleep until 6AM 
     else:
         time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 600)   # Sleep 10 Minutes
+
+except KeyboardInterrupt:
+    pass
 
 except:
     print('ERROR')
