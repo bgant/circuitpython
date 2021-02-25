@@ -158,7 +158,6 @@ try:
 
     # Draw "Feels Like" Temperature
     feels_like = str(round(json_data['current']['feels_like'])) + chr(176)
-    print("Feels Like:  ", feels_like)
     draw_text(text='feels like',scale=1,x=200,y=97,color=BLACK)
     draw_text(text=feels_like,scale=2,x=220,y=112,color=BLACK)
 
@@ -167,7 +166,7 @@ try:
     description_x = 37
     forecast_y = 23
     for i in range(0,5):
-        hour_24 = localtime(json_data['hourly'][i]['dt'] + json_data['timezone_offset']).tm_hour
+        hour_24 = localtime(json_data['hourly'][i]['dt'] + json_data['timezone_offset']).tm_hour 
 
         # Convert from 24-hour to 12-hour AM/PM format
         if hour_24 > 12:
@@ -182,26 +181,33 @@ try:
         else:
             hour_x = 10
 
-        # Draw Hours on Display
+        # Draw Hour
         draw_text(text=hour_string,scale=1,x=hour_x,y=forecast_y,color=BLACK)
 
-        # Draw Description on Display
+        # Draw Description
         description = str(json_data['hourly'][i]['weather'][0]['description'])
         draw_text(text=description,scale=1,x=description_x,y=forecast_y,color=BLACK)
-
+        
+        # Shift down for next hourly forecast line
         forecast_y += 20
 
     # Push Image to the Display
     write_to_display()
 
-    # Go to sleep for ten minutes 
+    # Go to sleep
     import alarm
     from time import monotonic
-    time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 600)
+    current_hour = localtime(json_data['current']['dt'] + json_data['timezone_offset']).tm_hour
+    if current_hour > 11:
+        time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 25200) # Sleep until 6AM 
+    else:
+        time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 600)   # Sleep 10 Minutes
 
 except:
-    from microcontroller import reset
     print('ERROR')
+    from time import sleep
+    sleep(30)
+    from microcontroller import reset
     reset()
 
 finally: 
