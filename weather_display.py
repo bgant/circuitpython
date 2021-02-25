@@ -146,8 +146,14 @@ try:
     json_data = openweathermap.pull_data()
 
     # Draw Icon Image
-    icon = str(json_data['current']['weather'][0]['icon'])[:-1]  # Strip off the 'd' or 'n' since this is not a color display
-    #icon = '50'  # Test Options: 01 02 03 04 09 10 11 13 50
+    icon = str(json_data['current']['weather'][0]['icon'])
+    if '01d' in icon:
+        icon = 'sun'
+    elif '01n' in icon:
+        icon = 'moon'
+    else:
+        icon = icon[:-1]  # Strip off the 'd' or 'n'
+    #icon = 'sun'  # Test Options: 01 02 03 04 09 10 11 13 50
     image = "/icons/" + icon + ".bmp"
     draw_image(image=image, x=182, y=12)
 
