@@ -209,7 +209,7 @@ try:
     import alarm
     from time import monotonic
     current_hour = localtime(json_data['current']['dt'] + json_data['timezone_offset']).tm_hour
-    if current_hour > 11:
+    if current_hour > 23:
         time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 25200) # Sleep until 6AM 
     else:
         time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 600)   # Sleep 10 Minutes
