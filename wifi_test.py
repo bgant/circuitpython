@@ -1,4 +1,11 @@
 # Source: https://circuitpython.readthedocs.io/en/latest/shared-bindings/wifi/index.html
+#
+# Example secrets.py file:
+#    secrets = {
+#        'ssid'     : 'wifi_name',
+#        'password' : 'wifi_password',
+#        }
+#
 
 import wifi
 from secrets import secrets
