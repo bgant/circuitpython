@@ -164,24 +164,31 @@ try:
 
     # Draw hourly forecast
     from time import localtime
-    hour_x = 10
     description_x = 37
     forecast_y = 23
     for i in range(0,5):
         hour_24 = localtime(json_data['hourly'][i]['dt'] + json_data['timezone_offset']).tm_hour
+
+        # Convert from 24-hour to 12-hour AM/PM format
         if hour_24 > 12:
             hour_12 = hour_24 - 12
         else:
             hour_12 = hour_24
-        hour_string = str(hour_12) + str("PM" if hour_24 > 12 else "AM")  # Using 12-hour AM/PM format
+        hour_string = str(hour_12) + str("PM" if hour_24 > 12 else "AM")
+
+        # Line up hours on screen 
         if hour_12 > 9:
             hour_x = 4   # Adjust text to left 6 pixels (1 scale=1 character width) if 10, 11, or 12 to line up
+        else:
+            hour_x = 10
+
+        # Draw Hours on Display
         draw_text(text=hour_string,scale=1,x=hour_x,y=forecast_y,color=BLACK)
 
+        # Draw Description on Display
         description = str(json_data['hourly'][i]['weather'][0]['description'])
         draw_text(text=description,scale=1,x=description_x,y=forecast_y,color=BLACK)
 
-        print(hour_string, description)
         forecast_y += 20
 
     # Push Image to the Display
@@ -191,6 +198,11 @@ try:
     import alarm
     from time import monotonic
     time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 600)
+
+except:
+    from microcontroller import reset
+    print('ERROR')
+    reset()
 
 finally: 
     displayio.release_displays() 
