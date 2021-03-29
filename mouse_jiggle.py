@@ -1,7 +1,6 @@
-# Go to https://pypi.org/project/adafruit-circuitpython-hid
-#   Click Download Files
-#   Click *.tar.gz file to download and open
-#   Extract adafruit_hid folder to CIRCUITPY/lib folder
+# Go to https://github.com/adafruit/Adafruit_CircuitPython_HID
+#   Click Code -> Download ZIP
+#   Open .zip file and extract adafruit_hid folder to CIRCUITPY/lib folder
 
 from time import sleep
 import usb_hid
