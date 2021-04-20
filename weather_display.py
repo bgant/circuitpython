@@ -1,6 +1,6 @@
 # Brandon Gant
 # Created: 2021-02-24
-# Updated:
+# Updated: 2021-04-20
 #
 # Unexpected Maker FeatherS2:
 #     https://feathers2.io/
@@ -16,7 +16,7 @@
 #     adafruit_il0373.mpy
 #     adafruit_framebuf.mpy
 #     adafruit_display_text/ 
-#     adafruit_requests.mpy  <-- Used by openweathermap.py Module
+#     adafruit_requests.mpy
 #
 # OpenWeatherMap images:
 #    https://openweathermap.org/weather-conditions
@@ -27,7 +27,6 @@
 #      * File --> Export As.. ---> 01.bmp --> Advanced Options --> 16 bits R5 G6 B5
 #      * Copy 01.bmp image to CIRCUITPY/icons/
 #
-# Copy openweathermap.py  to CIRCUITPY/
 # Copy weather_display.py to CIRCUITPY/code.py
 #
 
@@ -46,12 +45,18 @@ DISPLAY_HEIGHT = 128
 
 # Display Colors
 BLACK = 0x000000
-DARK_GREY = 0x616163  # from panda_head.bmp test pattern
+DARK_GREY = 0x616163   # from panda_head.bmp test pattern
 LIGHT_GREY = 0xABADB0  # from panda_head.bmp test pattern
 WHITE = 0xFFFFFF
 
 # Display Background Color
 BACKGROUND = LIGHT_GREY
+
+# Forecast Block Location
+forecast_location = {'x':5, 'y':23}
+
+# Image and Temp Block Location
+temp_location = {'x':200, 'y':12}
 
 
 #----------------------------------------------------------------
@@ -124,7 +129,7 @@ def draw_image(image="/icons/10.bmp", x=0, y=0):
 
 
 #----------------------------------------------------------------
-# Write Text and Images on E-Ink Display
+# Write Text and Images on E-Ink Display Function
 #----------------------------------------------------------------
 
 def write_to_display():
@@ -137,96 +142,103 @@ def write_to_display():
     while display.busy:
         pass  # Don't Exit script before screen refresh finishes
 
+#----------------------------------------------------------------
+# Convert 24-hour time to 12-hour AM/PM Function
+#----------------------------------------------------------------
+
+def convert_hour(hour_24=12, forecast_x=4):
+    if hour_24 is 0:
+        hour_string = '12AM'
+    elif hour_24 is 12:
+        hour_string = '12PM'
+    else:
+        hour_string = str(hour_24 % 12) + str("PM" if hour_24 > 11 else "AM")
+        if (hour_24 % 12) not in [10,11,12]:
+            forecast_x += 6  # Line up single and double digit numbers
+    return (hour_string, forecast_x)
+
 
 #----------------------------------------------------------------
 # Main Code Block
 #----------------------------------------------------------------
-try:
-    import openweathermap
-    json_data = openweathermap.pull_data()
 
-    # Draw Icon Image
-    icon = str(json_data['current']['weather'][0]['icon'])
-    if '01d' in icon:
-        icon = 'sun'
-    elif '01n' in icon:
-        icon = 'moon'
-    else:
-        icon = icon[:-1]  # Strip off the 'd' or 'n'
-    #icon = '11'  # Test Options: sun moon 02 03 04 09 10 11 13 50
-    image = "/icons/" + icon + ".bmp"
-    draw_image(image=image, x=196, y=12)
+import ipaddress
+import ssl
+import wifi
+import socketpool
+import adafruit_requests    # Copy adafruit_requests.mpy from Bundle to /lib/
+from secrets import secrets # Create secrets.py file with key:value pairs (see note above)
 
-    # Draw Current Temperature
-    temp = str(round(json_data['current']['temp'])) + chr(176)
-    print("Current Temp:", temp)
-    draw_text(text=temp,scale=3,x=232,y=15,color=BLACK)
+JSON_URL = "https://api.openweathermap.org/data/2.5/onecall?lat=" + secrets['lat'] + "&lon=" + secrets['lon'] + "&units=imperial&exclude=minutely&appid=" + secrets['appid']
+wifi.radio.enabled = True
+wifi.radio.connect(secrets["ssid"], secrets["password"])
+pool = socketpool.SocketPool(wifi.radio)
+https = adafruit_requests.Session(pool, ssl.create_default_context())
+response = https.get(JSON_URL)
+json_data = response.json()
+response.close()
+wifi.radio.enabled = False  # Turning wifi off to conserve battery
 
-    # Draw "Feels Like" Temperature
-    feels_like = str(round(json_data['current']['feels_like'])) + chr(176)
-    draw_text(text='feels like',scale=1,x=214,y=97,color=BLACK)
-    draw_text(text=feels_like,scale=2,x=234,y=112,color=BLACK)
+# Draw Icon Image
+icon = str(json_data['current']['weather'][0]['icon'])
+if '01d' in icon:
+    icon = 'sun'
+elif '01n' in icon:
+    icon = 'moon'
+else:
+    icon = icon[:-1]  # Strip off the 'd' or 'n'
+#icon = '11'  # Test Options: sun moon 02 03 04 09 10 11 13 50
+image = "/icons/" + icon + ".bmp"
+draw_image(image=image, x=temp_location['x'], y=temp_location['y'])
 
-    # Draw hourly forecast
-    from time import localtime
-    description_x = 37
-    forecast_y = 23
-    for i in range(0,5):
-        hour_24 = localtime(json_data['hourly'][i]['dt'] + json_data['timezone_offset']).tm_hour 
+# Draw Current Temperature
+temp = str(round(json_data['current']['temp'])) + chr(176)
+print("Current Temp:", temp)
+draw_text(text=temp,scale=3,x=temp_location['x'] + 34,y=temp_location['y'] + 3,color=BLACK)
 
-        # Convert from 24-hour to 12-hour AM/PM format
-        if hour_24 > 12:
-            hour_12 = hour_24 - 12
-        else:
-            hour_12 = hour_24
+# Draw "Feels Like" Temperature
+feels_like = str(round(json_data['current']['feels_like'])) + chr(176)
+draw_text(text='feels like',scale=1,x=temp_location['x'] + 20,y=temp_location['y'] + 85,color=BLACK)
+draw_text(text=feels_like,scale=2,x=temp_location['x'] + 38,y=temp_location['y'] + 100,color=BLACK)
 
-        if hour_12 is 0:
-            hour_string = '12AM'
-        else:
-            hour_string = str(hour_12) + str("PM" if hour_24 > 11 else "AM")
+# Draw hourly forecast
+from time import localtime
+forecast_y = forecast_location['y']
+for i in range(0,5):
+    # Draw Hour
+    forecast_x = forecast_location['x']
+    hour_24 = localtime(json_data['hourly'][i]['dt'] + json_data['timezone_offset']).tm_hour 
+    (hour_string, forecast_x) = convert_hour(hour_24, forecast_x)   # Convert from 24-hour to 12-hour AM/PM format
+    draw_text(text=hour_string,scale=1,x=forecast_x,y=forecast_y,color=BLACK)
 
-        # Line up hours on screen 
-        if hour_12 > 9:
-            hour_x = 4   # Adjust text to left 6 pixels (1 scale=1 character width) if 10, 11, or 12 to line up
-        else:
-            hour_x = 10
-
-        # Draw Hour
-        draw_text(text=hour_string,scale=1,x=hour_x,y=forecast_y,color=BLACK)
-
-        # Draw Description
-        description = str(json_data['hourly'][i]['weather'][0]['description'])
-        #description = 'thunderstorm with heavy drizzle'  # Longest text string
-        draw_text(text=description,scale=1,x=description_x,y=forecast_y,color=BLACK)
+    # Draw Description
+    description = str(json_data['hourly'][i]['weather'][0]['description'])
+    #description = 'thunderstorm with heavy drizzle'  # Longest text string
+    draw_text(text=description,scale=1,x=forecast_location['x'] + 33,y=forecast_y,color=BLACK)
         
-        # Shift down for next hourly forecast line
-        forecast_y += 20
+    # Shift down for next hourly forecast line
+    forecast_y += 20
 
-    # Push Image to the Display
-    write_to_display()
+# Push Image to the Display
+write_to_display()
 
-    # Go to sleep
-    import alarm
-    from time import monotonic
-    current_hour = localtime(json_data['current']['dt'] + json_data['timezone_offset']).tm_hour
-    if current_hour > 23:
-        time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 25200) # Sleep until 6AM 
-    else:
-        time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 600)   # Sleep 10 Minutes
+# Release all connections to Display
+displayio.release_displays() 
+spi.unlock()
+spi.deinit()  # Release IO36 SPI SCK Pin
 
-except KeyboardInterrupt:
-    pass
-
-except:
-    print('ERROR')
-    from time import sleep
-    sleep(30)
-    from microcontroller import reset
-    reset()
-
-finally: 
-    displayio.release_displays() 
-    spi.unlock()
-    spi.deinit()  # Release IO36 SPI SCK Pin
-    alarm.exit_and_deep_sleep_until_alarms(time_alarm)  # If USB is connected it says "Pretending to deep sleep until alerm, CTRL+C or file write"
+# Go into Deep Sleep
+# Source: https://circuitpython.readthedocs.io/en/6.2.x/shared-bindings/alarm/index.html
+import alarm
+from time import monotonic
+current_hour = localtime(json_data['current']['dt'] + json_data['timezone_offset']).tm_hour
+current_minute = localtime(json_data['current']['dt'] + json_data['timezone_offset']).tm_min
+# Set an alarm for 600 seconds from now
+if current_hour > 23:
+    time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 25200) # Sleep until 6AM 
+else:
+    time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 600)   # Sleep 10 Minutes
+# Deep sleep until the alarm goes off then restart the program
+print("Current Time: %s:%s" % (current_hour,current_minute))
+alarm.exit_and_deep_sleep_until_alarms(time_alarm)
 
