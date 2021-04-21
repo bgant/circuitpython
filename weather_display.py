@@ -233,12 +233,14 @@ import alarm
 from time import monotonic
 current_hour = localtime(json_data['current']['dt'] + json_data['timezone_offset']).tm_hour
 current_minute = localtime(json_data['current']['dt'] + json_data['timezone_offset']).tm_min
-# Set an alarm for 600 seconds from now
-if current_hour > 23:
-    time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 25200) # Sleep until 6AM 
+print("Current Time: %s:%s" % (current_hour,current_minute))
+# Set the Deep Sleep Alarm
+if current_hour > 20 or current_hour < 6:
+    print("Setting Deep Sleep Alarm for 1 Hour")
+    time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 3600)  # Sleep 1 hour 
 else:
+    print("Setting Deep Sleep Alarm for 10 Minutes")
     time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 600)   # Sleep 10 Minutes
 # Deep sleep until the alarm goes off then restart the program
-print("Current Time: %s:%s" % (current_hour,current_minute))
 alarm.exit_and_deep_sleep_until_alarms(time_alarm)
 
