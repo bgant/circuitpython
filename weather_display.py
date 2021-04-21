@@ -233,7 +233,7 @@ import alarm
 from time import monotonic
 current_hour = localtime(json_data['current']['dt'] + json_data['timezone_offset']).tm_hour
 current_minute = localtime(json_data['current']['dt'] + json_data['timezone_offset']).tm_min
-print("Current Time: %s:%s" % (current_hour,current_minute))
+print("Current Time: %02d:%02d" % (current_hour,current_minute))
 # Set the Deep Sleep Alarm
 if current_hour > 20 or current_hour < 6:
     print("Setting Deep Sleep Alarm for 1 Hour")
