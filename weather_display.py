@@ -167,57 +167,64 @@ import ssl
 import wifi
 import socketpool
 import adafruit_requests    # Copy adafruit_requests.mpy from Bundle to /lib/
-from secrets import secrets # Create secrets.py file with key:value pairs (see note above)
+try:
+    from secrets import secrets # Create secrets.py file with key:value pairs (see note above)
+except:
+    print("You need to create a secrets.py file... See comments at the top of this script.")
 
-JSON_URL = "https://api.openweathermap.org/data/2.5/onecall?lat=" + secrets['lat'] + "&lon=" + secrets['lon'] + "&units=imperial&exclude=minutely&appid=" + secrets['appid']
-wifi.radio.enabled = True
-wifi.radio.connect(secrets["ssid"], secrets["password"])
-pool = socketpool.SocketPool(wifi.radio)
-https = adafruit_requests.Session(pool, ssl.create_default_context())
-response = https.get(JSON_URL)
-json_data = response.json()
-response.close()
-wifi.radio.enabled = False  # Turning wifi off to conserve battery
+try:
+    JSON_URL = "https://api.openweathermap.org/data/2.5/onecall?lat=" + secrets['lat'] + "&lon=" + secrets['lon'] + "&units=imperial&exclude=minutely&appid=" + secrets['appid']
+    wifi.radio.enabled = True
+    wifi.radio.connect(secrets["ssid"], secrets["password"])
+    pool = socketpool.SocketPool(wifi.radio)
+    https = adafruit_requests.Session(pool, ssl.create_default_context())
+    response = https.get(JSON_URL)
+    json_data = response.json()
+    response.close()
+    wifi.radio.enabled = False  # Turning wifi off to conserve battery
 
-# Draw Icon Image
-icon = str(json_data['current']['weather'][0]['icon'])
-if '01d' in icon:
-    icon = 'sun'
-elif '01n' in icon:
-    icon = 'moon'
-else:
-    icon = icon[:-1]  # Strip off the 'd' or 'n'
-#icon = '11'  # Test Options: sun moon 02 03 04 09 10 11 13 50
-image = "/icons/" + icon + ".bmp"
-draw_image(image=image, x=temp_location['x'], y=temp_location['y'])
+    # Draw Icon Image
+    icon = str(json_data['current']['weather'][0]['icon'])
+    if '01d' in icon:
+        icon = 'sun'
+    elif '01n' in icon:
+        icon = 'moon'
+    else:
+        icon = icon[:-1]  # Strip off the 'd' or 'n'
+    #icon = '11'  # Test Options: sun moon 02 03 04 09 10 11 13 50
+    image = "/icons/" + icon + ".bmp"
+    draw_image(image=image, x=temp_location['x'], y=temp_location['y'])
 
-# Draw Current Temperature
-temp = str(round(json_data['current']['temp'])) + chr(176)
-print("Current Temp:", temp)
-draw_text(text=temp,scale=3,x=temp_location['x'] + 34,y=temp_location['y'] + 3,color=BLACK)
+    # Draw Current Temperature
+    temp = str(round(json_data['current']['temp'])) + chr(176)
+    print("Current Temp:", temp)
+    draw_text(text=temp,scale=3,x=temp_location['x'] + 34,y=temp_location['y'] + 3,color=BLACK)
 
-# Draw "Feels Like" Temperature
-feels_like = str(round(json_data['current']['feels_like'])) + chr(176)
-draw_text(text='feels like',scale=1,x=temp_location['x'] + 20,y=temp_location['y'] + 85,color=BLACK)
-draw_text(text=feels_like,scale=2,x=temp_location['x'] + 38,y=temp_location['y'] + 100,color=BLACK)
+    # Draw "Feels Like" Temperature
+    feels_like = str(round(json_data['current']['feels_like'])) + chr(176)
+    draw_text(text='feels like',scale=1,x=temp_location['x'] + 20,y=temp_location['y'] + 85,color=BLACK)
+    draw_text(text=feels_like,scale=2,x=temp_location['x'] + 38,y=temp_location['y'] + 100,color=BLACK)
 
-# Draw hourly forecast
-from time import localtime
-forecast_y = forecast_location['y']
-for i in range(0,5):
-    # Draw Hour
-    forecast_x = forecast_location['x']
-    hour_24 = localtime(json_data['hourly'][i]['dt'] + json_data['timezone_offset']).tm_hour 
-    (hour_string, forecast_x) = convert_hour(hour_24, forecast_x)   # Convert from 24-hour to 12-hour AM/PM format
-    draw_text(text=hour_string,scale=1,x=forecast_x,y=forecast_y,color=BLACK)
+    # Draw hourly forecast
+    from time import localtime
+    forecast_y = forecast_location['y']
+    for i in range(0,5):
+        # Draw Hour
+        forecast_x = forecast_location['x']
+        hour_24 = localtime(json_data['hourly'][i]['dt'] + json_data['timezone_offset']).tm_hour 
+        (hour_string, forecast_x) = convert_hour(hour_24, forecast_x)   # Convert from 24-hour to 12-hour AM/PM format
+        draw_text(text=hour_string,scale=1,x=forecast_x,y=forecast_y,color=BLACK)
 
-    # Draw Description
-    description = str(json_data['hourly'][i]['weather'][0]['description'])
-    #description = 'thunderstorm with heavy drizzle'  # Longest text string
-    draw_text(text=description,scale=1,x=forecast_location['x'] + 33,y=forecast_y,color=BLACK)
+        # Draw Description
+        description = str(json_data['hourly'][i]['weather'][0]['description'])
+        #description = 'thunderstorm with heavy drizzle'  # Longest text string
+        draw_text(text=description,scale=1,x=forecast_location['x'] + 33,y=forecast_y,color=BLACK)
         
-    # Shift down for next hourly forecast line
-    forecast_y += 20
+        # Shift down for next hourly forecast line
+        forecast_y += 20
+except:
+    print("ERROR")
+    pass
 
 # Push Image to the Display
 write_to_display()
@@ -231,8 +238,12 @@ spi.deinit()  # Release IO36 SPI SCK Pin
 # Source: https://circuitpython.readthedocs.io/en/6.2.x/shared-bindings/alarm/index.html
 import alarm
 from time import monotonic
-current_hour = localtime(json_data['current']['dt'] + json_data['timezone_offset']).tm_hour
-current_minute = localtime(json_data['current']['dt'] + json_data['timezone_offset']).tm_min
+try:
+    current_hour = localtime(json_data['current']['dt'] + json_data['timezone_offset']).tm_hour
+    current_minute = localtime(json_data['current']['dt'] + json_data['timezone_offset']).tm_min
+except:
+    current_hour = 12
+    current_minute = 0
 print("Current Time: %02d:%02d" % (current_hour,current_minute))
 # Set the Deep Sleep Alarm
 if current_hour > 20 or current_hour < 6:
