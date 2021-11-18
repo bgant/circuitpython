@@ -1,34 +1,35 @@
-# Brandon Gant
-# Created: 2021-02-24
-# Updated: 2021-04-20
-#
-# Unexpected Maker FeatherS2:
-#     https://feathers2.io/
-#     https://www.adafruit.com/product/4769
-# Adafruit 2.9" E-Ink FeatherWing:
-#     https://www.adafruit.com/product/4777
-# CircuitPython 6.2:
-#     https://circuitpython.org/board/unexpectedmaker_feathers2/
-# CircuitPython Bundle Version 6.x Libraries:
-#     https://circuitpython.org/libraries
-#
-# Libraries used by this script copied to CIRCUITPY/lib/
-#     adafruit_il0373.mpy
-#     adafruit_framebuf.mpy
-#     adafruit_display_text/ 
-#     adafruit_requests.mpy
-#
-# OpenWeatherMap images:
-#    https://openweathermap.org/weather-conditions
-#    Convert PNG image to BMP example:
-#      * Open 01d@2x.png image in Gimp
-#      * Set 'Paint Fill' to ABADB0 (Light Grey)
-#      * Paint Fill the clear background 
-#      * File --> Export As.. ---> 01.bmp --> Advanced Options --> 16 bits R5 G6 B5
-#      * Copy 01.bmp image to CIRCUITPY/icons/
-#
-# Copy weather_display.py to CIRCUITPY/code.py
-#
+'''
+Brandon Gant
+Created: 2021-02-24
+Updated: 2021-04-20
+
+Unexpected Maker FeatherS2:
+    https://feathers2.io/
+    https://www.adafruit.com/product/4769
+Adafruit 2.9" E-Ink FeatherWing:
+    https://www.adafruit.com/product/4777
+CircuitPython 6.2:
+    https://circuitpython.org/board/unexpectedmaker_feathers2/
+CircuitPython Bundle Version 6.x Libraries:
+    https://circuitpython.org/libraries
+
+Libraries used by this script copied to CIRCUITPY/lib/
+    adafruit_il0373.mpy
+    adafruit_framebuf.mpy
+    adafruit_display_text/ 
+    adafruit_requests.mpy
+
+OpenWeatherMap images:
+   https://openweathermap.org/weather-conditions
+   Convert PNG image to BMP example:
+     * Open 01d@2x.png image in Gimp
+     * Set 'Paint Fill' to ABADB0 (Light Grey)
+     * Paint Fill the clear background 
+     * File --> Export As.. ---> 01.bmp --> Advanced Options --> 16 bits R5 G6 B5
+     * Copy 01.bmp image to CIRCUITPY/icons/
+
+Copy weather_display.py to CIRCUITPY/code.py
+'''
 
 #----------------------------------------------------------------
 # Display Settings
