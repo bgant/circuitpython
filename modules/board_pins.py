@@ -1,3 +1,11 @@
+# SPDX-FileCopyrightText: 2021 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+#
+# Sources:
+#    https://learn.adafruit.com/getting-started-with-raspberry-pi-pico-circuitpython/circuitpython-pins-and-modules
+#    https://github.com/adafruit/Adafruit_Learning_System_Guides/blob/main/CircuitPython_Essentials/Pin_Map_Script/code.py
+
 """CircuitPython Essentials Pin Map Script"""
 import microcontroller
 import board
@@ -13,4 +21,3 @@ for pin in dir(microcontroller.pin):
             board_pins.append(" ".join(pins))
 for pins in sorted(board_pins):
     print(pins)
-
