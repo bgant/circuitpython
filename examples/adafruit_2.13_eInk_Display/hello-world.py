@@ -6,6 +6,7 @@ import adafruit_ssd1680
 
 displayio.release_displays()
 
+# Using SPI1 on Pi Pico W
 spi = busio.SPI(board.GP14, MOSI=board.GP15)  # Uses SCK and MOSI
 epd_cs = board.GP13
 epd_dc = board.GP22
@@ -17,6 +18,7 @@ display_bus = displayio.FourWire(
 )
 time.sleep(1)  # Wait a bit
 
+# Create the display object - the third color is red (0xff0000)
 # For issues with display not updating top/bottom rows correctly set colstart to 8
 display = adafruit_ssd1680.SSD1680(
     display_bus,
