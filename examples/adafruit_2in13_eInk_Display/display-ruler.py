@@ -1,6 +1,6 @@
 import board
-import adafruit_2in13_eInk
-display = adafruit_2in13_eInk.DISPLAY(
+from adafruit_2in13_eInk import DISPLAY, DISPLAY_WIDTH, DISPLAY_HEIGHT
+display = DISPLAY(
     sck =   board.GP14,  # SPI1_SCK
     mosi =  board.GP15,  # SPI1_TX
     cs =    board.GP13,  # SPI1_CSn
@@ -10,7 +10,7 @@ display = adafruit_2in13_eInk.DISPLAY(
     )
 
 import displayio
-g = displayio.Group()
+image_buffer = displayio.Group()
 
 with open("/display-ruler.bmp", "rb") as f:
     pic = displayio.OnDiskBitmap(f)
@@ -20,9 +20,9 @@ with open("/display-ruler.bmp", "rb") as f:
     )
     # CircuitPython 7 compatible only
     # t = displayio.TileGrid(pic, pixel_shader=pic.pixel_shader)
-    g.append(t)
+    image_buffer.append(t)
 
-    display.show(g)
+    display.show(image_buffer)
 
     display.refresh()
 

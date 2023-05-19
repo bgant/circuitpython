@@ -1,7 +1,7 @@
 
 import board
-import adafruit_2in13_eInk
-display = adafruit_2in13_eInk.DISPLAY(
+from adafruit_2in13_eInk import DISPLAY, DISPLAY_WIDTH, DISPLAY_HEIGHT
+display = DISPLAY(
     sck =   board.GP14,  # SPI1_SCK
     mosi =  board.GP15,  # SPI1_TX
     cs =    board.GP13,  # SPI1_CSn
@@ -12,7 +12,7 @@ display = adafruit_2in13_eInk.DISPLAY(
 
 # Create a display group for our screen objects
 import displayio
-g = displayio.Group()
+image_buffer = displayio.Group()
 
 #################################################
 # You can now use all Adafruit "display" examples
@@ -24,34 +24,22 @@ g = displayio.Group()
 import terminalio
 from adafruit_display_text import label
 
-DISPLAY_WIDTH = 250
-DISPLAY_HEIGHT = 122
-
-BLACK = 0x000000
-WHITE = 0xFFFFFF
-RED =   0xFF0000
-
-BACKGROUND_COLOR = WHITE
-
 # Set a background
 background_bitmap = displayio.Bitmap(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1)
-# Map colors in a palette
-palette = displayio.Palette(1)
-palette[0] = BACKGROUND_COLOR
-
-# Create a Tilegrid with the background and put in the displayio group
-t = displayio.TileGrid(background_bitmap, pixel_shader=palette)
-g.append(t)
+palette = displayio.Palette(1)  # Map colors in a palette
+palette[0] = 0xff0000           # Background Color
+background_color = displayio.TileGrid(background_bitmap, pixel_shader=palette)  # Create a Tilegrid with the background
+image_buffer.append(background_color)
 
 # Draw simple text using the built-in font into a displayio group
-text_group = displayio.Group(scale=2, x=20, y=40)
+text_group = displayio.Group(scale=3, x=20, y=int(DISPLAY_HEIGHT/2))
 text = "Hello World!"
-text_area = label.Label(terminalio.FONT, text=text, color=RED)
+text_area = label.Label(terminalio.FONT, text=text, color=0xffffff)
 text_group.append(text_area)  # Add this text to the text group
-g.append(text_group)
+image_buffer.append(text_group)
 
 # Place the display group on the screen
-display.show(g)
+display.show(image_buffer)
 
 # Refresh the display to have everything show on the display
 # NOTE: Do not refresh eInk displays more often than 180 seconds!
