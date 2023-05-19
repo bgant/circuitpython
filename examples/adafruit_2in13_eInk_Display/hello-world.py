@@ -31,7 +31,6 @@ BLACK = 0x000000
 WHITE = 0xFFFFFF
 RED =   0xFF0000
 
-FOREGROUND_COLOR = RED
 BACKGROUND_COLOR = WHITE
 
 # Set a background
@@ -47,7 +46,7 @@ g.append(t)
 # Draw simple text using the built-in font into a displayio group
 text_group = displayio.Group(scale=2, x=20, y=40)
 text = "Hello World!"
-text_area = label.Label(terminalio.FONT, text=text, color=BLACK)
+text_area = label.Label(terminalio.FONT, text=text, color=RED)
 text_group.append(text_area)  # Add this text to the text group
 g.append(text_group)
 
