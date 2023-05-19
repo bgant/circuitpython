@@ -11,41 +11,15 @@ display = DISPLAY(
     )
 
 # Create a display group for our screen objects
-import displayio
-image_buffer = displayio.Group()
-
-#################################################
-# You can now use all Adafruit "display" examples
-#################################################
-
-
-# Source: https://learn.adafruit.com/quickstart-using-adafruit-eink-epaper-displays-with-circuitpython/example-simple-text
-
-import terminalio
-from adafruit_display_text import label
-
-# Set a background
-background_bitmap = displayio.Bitmap(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1)
-palette = displayio.Palette(1)  # Map colors in a palette
-palette[0] = 0xff0000           # Background Color
-background_color = displayio.TileGrid(background_bitmap, pixel_shader=palette)  # Create a Tilegrid with the background
-image_buffer.append(background_color)
-
-# Draw simple text using the built-in font into a displayio group
-text_group = displayio.Group(scale=3, x=20, y=int(DISPLAY_HEIGHT/2))
-text = "Hello World!"
-text_area = label.Label(terminalio.FONT, text=text, color=0xffffff)
-text_group.append(text_area)  # Add this text to the text group
-image_buffer.append(text_group)
-
-# Place the display group on the screen
+from displayio import Group
+from image_functions import background_color, text_group, draw_image
+image_buffer = Group()
+#image_buffer.append(background_color(width=DISPLAY_WIDTH, height=DISPLAY_HEIGHT, color=0xff0000))
+image_buffer.append(draw_image('/display-ruler.bmp'))
+image_buffer.append(text_group(string="Hello World!", scale=3, x=20, y=int(DISPLAY_HEIGHT/2), color=0x000000))
 display.show(image_buffer)
-
-# Refresh the display to have everything show on the display
-# NOTE: Do not refresh eInk displays more often than 180 seconds!
-display.refresh()
+display.refresh()  # NOTE: Do not refresh eInk displays more often than 180 seconds!
 
 print("drawing image...")
-
 while display.busy:
     pass  # Wait until all display processing is complete
