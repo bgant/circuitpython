@@ -19,12 +19,17 @@ def draw_background_color(width=None, height=None, color=0xffffff):
 
 
 # Draw simple text using the built-in font into a displayio group
-def draw_text(string='No Text', scale=2, x=20, y=20, color=0x000000):
+def draw_text(string='No Text', scale=2, x=20, y=20, color=0x000000, font=None):
     from displayio import Group
     from adafruit_display_text import label
-    from terminalio import FONT
+    if font:
+        from adafruit_bitmap_font import bitmap_font
+        font_library = bitmap_font.load_font(font)  # i.e. font="/Helvetica-Bold-16.bdf"
+    else:
+        from terminalio import FONT
+        font_library = FONT
     text_group = Group(scale=scale, x=x, y=y)
-    text_area = label.Label(FONT, text=string, color=color)
+    text_area = label.Label(font_library, text=string, color=color)
     text_group.append(text_area)  # Add this text to the text group
     return text_group
 

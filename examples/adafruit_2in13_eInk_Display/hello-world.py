@@ -15,8 +15,9 @@ from displayio import Group
 from my_image_functions import draw_background_color, draw_text, draw_image
 image_buffer = Group()
 image_buffer.append(draw_background_color(width=DISPLAY_WIDTH, height=DISPLAY_HEIGHT, color=0xff0000))
-image_buffer.append(draw_image('/display-ruler.bmp', x=20, y=20))
+#image_buffer.append(draw_image('/display-ruler.bmp', x=20, y=20))
 image_buffer.append(draw_text(string="Hello World!", scale=3, x=20, y=int(DISPLAY_HEIGHT/2), color=0x000000))
+image_buffer.append(draw_text(string="Hello Again...", scale=1, x=20, y=90, color=0xffffff, font="/Comic-Bold-18.bdf"))
 display.show(image_buffer)
 display.refresh()  # NOTE: Do not refresh eInk displays more often than 180 seconds!
 
