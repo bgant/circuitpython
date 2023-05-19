@@ -1,4 +1,8 @@
-''' Example Usage on Pi Pico:
+'''
+Adafruit 2.13" Tri-Color eInk Display Breakout
+https://www.adafruit.com/product/4947
+
+Example Usage on Pi Pico:
 import board
 from my_adafruit_2in13_eInk import DISPLAY, DISPLAY_WIDTH, DISPLAY_HEIGHT
 display = DISPLAY(

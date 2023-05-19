@@ -1,4 +1,8 @@
-''' Example Pi Pico Usage:
+'''
+Adafruit Universal Thermocouple Amplifier MAX31856 Breakout
+https://www.adafruit.com/product/3263
+
+Example Pi Pico Usage:
 import board
 from my_adafruit_thermocouple import thermocouple
 sensor = thermocouple(sck=board.GP18, mosi=board.GP19, miso=board.GP16, cs=board.GP17)
