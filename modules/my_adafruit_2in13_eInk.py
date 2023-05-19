@@ -1,6 +1,6 @@
 ''' Example Usage on Pi Pico:
 import board
-from adafruit_2in13_eInk import DISPLAY, DISPLAY_WIDTH, DISPLAY_HEIGHT
+from my_adafruit_2in13_eInk import DISPLAY, DISPLAY_WIDTH, DISPLAY_HEIGHT
 display = DISPLAY(
     sck    = board.GP14,  # SPI1_SCK
     mosi   = board.GP15,  # SPI1_TX
@@ -36,7 +36,7 @@ def DISPLAY(sck=None, mosi=None, miso=None, cs=None, dc=None, reset=None, busy=N
     # For issues with display not updating top/bottom rows correctly set colstart to 8
     return adafruit_ssd1680.SSD1680(
         display_bus,
-        colstart=8,
+        colstart = 8,
         width=DISPLAY_WIDTH,
         height=DISPLAY_HEIGHT,
         busy_pin=busy,

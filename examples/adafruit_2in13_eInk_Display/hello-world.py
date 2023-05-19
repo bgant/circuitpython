@@ -1,18 +1,18 @@
 
 import board
-from adafruit_2in13_eInk import DISPLAY, DISPLAY_WIDTH, DISPLAY_HEIGHT
+from my_adafruit_2in13_eInk import DISPLAY, DISPLAY_WIDTH, DISPLAY_HEIGHT
 display = DISPLAY(
-    sck =   board.GP14,  # SPI1_SCK
-    mosi =  board.GP15,  # SPI1_TX
-    cs =    board.GP13,  # SPI1_CSn
-    dc =    board.GP22,
+    sck   = board.GP14,  # SPI1_SCK
+    mosi  = board.GP15,  # SPI1_TX
+    cs    = board.GP13,  # SPI1_CSn
+    dc    = board.GP22,
     reset = board.GP27,
-    busy =  board.GP26
+    busy  = board.GP26
     )
 
 # Create a display group for our screen objects
 from displayio import Group
-from image_functions import draw_background_color, draw_text, draw_image
+from my_image_functions import draw_background_color, draw_text, draw_image
 image_buffer = Group()
 image_buffer.append(draw_background_color(width=DISPLAY_WIDTH, height=DISPLAY_HEIGHT, color=0xff0000))
 image_buffer.append(draw_image('/display-ruler.bmp', x=20, y=20))

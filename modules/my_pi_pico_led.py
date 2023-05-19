@@ -1,5 +1,5 @@
 '''Example Pi Pico LED Usage:
-from pi_pico_led import led
+from my_pi_pico_led import led
 led(1) or led(True)
 led(0) or led(False)
 '''
