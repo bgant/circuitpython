@@ -1,7 +1,7 @@
 
 
 # Set a background
-def background_color(width=None, height=None, color=0xffffff):
+def draw_background_color(width=None, height=None, color=0xffffff):
     from displayio import Bitmap, Palette, TileGrid
     background_bitmap = Bitmap(width, height, 1)
     palette = Palette(1)  # Map colors in a palette
@@ -10,7 +10,7 @@ def background_color(width=None, height=None, color=0xffffff):
 
 
 # Draw simple text using the built-in font into a displayio group
-def text_group(string='No Text', scale=2, x=20, y=20, color=0x000000):
+def draw_text(string='No Text', scale=2, x=20, y=20, color=0x000000):
     from displayio import Group
     from adafruit_display_text import label
     from terminalio import FONT
