@@ -35,8 +35,7 @@ release_displays()
 def DISPLAY(sck=None, mosi=None, miso=None, cs=None, dc=None, reset=None, busy=None, enable=None):
     spi = SPI(sck, MOSI=mosi)  # Only uses SCK and MOSI
     display_bus = FourWire(spi, command=dc, chip_select=cs, reset=reset, baudrate=1000000)
-    sleep(1)  # Wait a bit for the bus to initialize
-    
+    sleep(1)  # Wait a bit for the bus to initialize   
     # For issues with display not updating top/bottom rows correctly set colstart to 8
     return adafruit_ssd1680.SSD1680(
         display_bus,

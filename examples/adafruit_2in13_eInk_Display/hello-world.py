@@ -7,7 +7,7 @@ display = DISPLAY(
     cs    = board.GP13,  # SPI1_CSn
     dc    = board.GP22,
     reset = board.GP27,
-    busy  = board.GP26
+    busy  = board.GP26,
     )
 
 # Create a display group for our screen objects
