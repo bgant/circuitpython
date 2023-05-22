@@ -72,7 +72,7 @@ sensor.averaging = 8
 # Air Temperature Function
 ###################################
 def air_reading():
-    if 6 < ntp.datetime[3] < 20:  # Run between 7AM and 11PM to conserve API Calls
+    if 6 < ntp.datetime[3] < 23:  # Run between 7AM and 11PM to conserve API Calls
         response = https.get(JSON_URL)
         json_data = response.json()
         response.close()
