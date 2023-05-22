@@ -135,13 +135,11 @@ def air_reading():
     
 # Account for size of 3-digit Air Temperatures
 def air_digits(air):
-    if air:
-        if air > 99:    # Number has 3 Digits
-            return -10  # Move x-coordinate farther left on screen
-        else:
-            return 14   # Normal x-coordinate two-digit position
+    if air > 99:    # Number has 3 Digits
+        return -10  # Move x-coordinate farther left on screen
     else:
-        return 14       # Normal x-coordiante if None
+        return 14   # Normal x-coordinate two-digit position
+
     
 
 ###################################
@@ -197,7 +195,10 @@ def main():
 
     # Update Air and Water Readings
     water = water_reading()
-    air = air_reading()
+    try:
+        air = air_reading()
+    except:
+        air = None
     
     # Send Water Reading to InfluxDB
     send_to_influxdb(water)
@@ -219,8 +220,9 @@ def main():
     image_buffer = Group()
     image_buffer.append(draw_background_color(width=DISPLAY_WIDTH, height=DISPLAY_HEIGHT, color=0xffffff))
     image_buffer.append(draw_image('/pool.bmp', x=0, y=0))
-    image_buffer.append(draw_text(string='' if air is None else str(air), scale=1, x=air_digits(air), y=50, color=0x000000, font='/GothamBlack-54.bdf'))
-    image_buffer.append(draw_text(string='Air', scale=1, x=40, y=95, color=0x000000, font='/GothamBlack-25.bdf'))
+    if air:
+        image_buffer.append(draw_text(string=str(air), scale=1, x=air_digits(air), y=50, color=0x000000, font='/GothamBlack-54.bdf'))
+        image_buffer.append(draw_text(string='Air', scale=1, x=40, y=95, color=0x000000, font='/GothamBlack-25.bdf'))
     image_buffer.append(draw_text(string=str(water), scale=1, x=14, y=185, color=0x000000, font='/GothamBlack-54.bdf'))
     image_buffer.append(draw_text(string='Water', scale=1, x=20, y=231, color=0x000000, font='/GothamBlack-25.bdf'))
     display.show(image_buffer)
