@@ -1,5 +1,47 @@
 
 
+'''secrets.py
+secrets = {
+    'ssid'        : '',
+    'password'    : '',
+    'timezone'    : 'America/Chicago',
+    'lat'         : '',
+    'lon'         : '',
+    'appid'       : '<from https://api.openweathermap.org>',
+    'server'      : '',
+    'port'        : '',
+    'database'    : '',
+    'measurement' : '',
+    'jwt'         : '<from https://jwt.io/#debugger-io>'
+    }
+'''
+
+'''JSON Web Token (jwt)
+If you enabled authentication in InfluxDB you need
+to create a JSON Web Token to write to a database:
+
+    https://www.unixtimestamp.com/index.php
+        Create a future Unix Timestamp expiration   
+
+    https://jwt.io/#debugger-io
+        HEADER
+            {
+              "alg": "HS256",
+              "typ": "JWT"
+             }
+        PAYLOAD
+            {
+              "username": "<InfluxDB username with WRITE to DATABASE>",
+              "exp": <Unix Timestamp expiration>
+            }
+        VERIFY SIGNATURE
+            HMACSHA256(
+              base64UrlEncode(header) + "." +
+              base64UrlEncode(payload),
+              <shared secret phrase set in InfluxDB>
+            )
+'''
+
 ###################################
 # Import Built-in Functions
 ###################################
@@ -29,12 +71,13 @@ import adafruit_ntp
 from my_adafruit_thermocouple import thermocouple
 from my_adafruit_2in13_eInk import DISPLAY, DISPLAY_WIDTH, DISPLAY_HEIGHT
 from my_image_functions import draw_background_color, draw_text, draw_image
+from my_pi_pico_led import led
 from my_client_id import client_id
 try:
-    from secrets import secrets # secrets.py file with key:value pairs (see note above)
+    from secrets import secrets
 except:
-    print('You need to create a secrets.py file... See comments at the top of this script.')
-
+    print('You need to create a secrets.py file... See example at the top of this script.')
+led(0)
 
 ###################################
 # Initialize Wifi
