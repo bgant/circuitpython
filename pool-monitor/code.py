@@ -67,7 +67,11 @@ display = DISPLAY(
 ###################################
 sensor = thermocouple(sck=board.GP18, mosi=board.GP19, miso=board.GP16, cs=board.GP17)
 sensor.averaging = 8
-degrees = b'\xC2\xB0'.decode()
+degree = '°'
+#degree = str(chr(176)) # XML Decimal
+#degree = b'\xC2\xB0'.decode() # utf-8
+#degree = '\u00b0'  # utf-16
+
 
 ###################################
 # Air Temperature Function
@@ -79,7 +83,7 @@ def air_reading():
         response.close()
         #print(json_data)
         feels_like = json_data['main']['feels_like']
-        print(f'Air Feels Like: {int(roundTraditional(feels_like,0))}{degrees}F')
+        print(f'Air Feels Like: {int(roundTraditional(feels_like,0))}{degree}F')
         return feels_like
     else:
         print(f'Skip Night-time Air Reading to conserve API calls...')
@@ -105,7 +109,7 @@ def roundTraditional(val,digits):
 
 def water_reading():
     thermoTempF = (sensor.temperature * 9.0/5.0) + 32
-    print(f'Water Temp:     {int(roundTraditional(thermoTempF,0))}{degrees}F')
+    print(f'Water Temp:     {int(roundTraditional(thermoTempF,0))}{degree}F')
     return thermoTempF
 
 ###################################
@@ -177,7 +181,9 @@ while True:
         sleep(sleep_interval)
         while display.time_to_refresh > 0:  # Just in case sleep_interval is too short
             pass
-    except:
+    except Exception as e:
+        print('ERROR:', e)
+        print(f'Sleeping for {sleep_interval} seconds before Soft-Reset...')
         sleep(sleep_interval)
         from supervisor import reload
         reload()  # Soft-Reset
