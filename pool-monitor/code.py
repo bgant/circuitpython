@@ -29,6 +29,7 @@ import adafruit_ntp
 from my_adafruit_thermocouple import thermocouple
 from my_adafruit_2in13_eInk import DISPLAY, DISPLAY_WIDTH, DISPLAY_HEIGHT
 from my_image_functions import draw_background_color, draw_text, draw_image
+from my_client_id import client_id
 try:
     from secrets import secrets # secrets.py file with key:value pairs (see note above)
 except:
@@ -112,13 +113,30 @@ def water_reading():
     print(f'Water Temp:     {int(roundTraditional(thermoTempF,0))}{degree}F')
     return thermoTempF
 
+
+###################################
+# InfluxDB Function
+###################################
+def send_to_influxdb(water):
+    if '443' in secrets['port']:
+        url = 'https://%s/influx/write?db=%s' % (secrets['server'], secrets['database'])
+    else:
+        url = 'http://%s:%s/write?db=%s' % (secrets['server'], secrets['port'], secrets['database'])
+    headers = {
+        'Content-type': 'application/x-www-form-urlencoded',
+        'Authorization': ''
+    }
+    headers['Authorization'] = 'Bearer %s' % secrets['jwt']
+    data = "%s,device=%s water=%.1f" % (secrets['measurement'], client_id, water)
+    response = https.post(url, headers=headers, data=data)
+    if '204' in str(response.status_code):  # HTTP Status 204 (No Content) indicates server fulfilled request
+        print(f'DB: {secrets['database']} \t Measurement: {data} \t Status: {response.status_code} Success')
+    else:
+        print(f'DB: {secrets['database']} \t Measurement: {data} \t Status: {response.status_code} Failed')
+
+
 ###################################
 # Send Water Temp Alert to Pushover
-###################################
-
-
-###################################
-# Send Water Temp to InfluxDB
 ###################################
 
 
@@ -139,6 +157,7 @@ def main():
     air = air_reading()
     
     # Send Water Reading to InfluxDB
+    send_to_influxdb(water)
     
     # Update Display Only if Readings have Changed
     air = None if air is None else int(roundTraditional(air,0))
