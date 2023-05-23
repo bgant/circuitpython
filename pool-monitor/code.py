@@ -194,11 +194,11 @@ def main():
     # If Power Lost Change Display and Exit
 
     # Update Air and Water Readings
-    water = water_reading()
     try:
         air = air_reading()
     except:
         air = None
+    water = water_reading()
     
     # Send Water Reading to InfluxDB
     send_to_influxdb(water)
