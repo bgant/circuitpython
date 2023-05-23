@@ -196,7 +196,8 @@ def main():
     # Update Air and Water Readings
     try:
         air = air_reading()
-    except:
+    except Exception as e:
+        print('ERROR:', e)
         air = None
     water = water_reading()
     
