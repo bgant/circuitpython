@@ -132,15 +132,7 @@ def air_reading():
     else:
         print(f'Skip Night-time Air Reading to conserve API calls...')
         return None
-    
-# Account for size of 3-digit Air Temperatures
-def air_digits(air):
-    if air > 99:    # Number has 3 Digits
-        return -10  # Move x-coordinate farther left on screen
-    else:
-        return 14   # Normal x-coordinate two-digit position
-
-    
+   
 
 ###################################
 # Water Temperature Function
@@ -171,9 +163,9 @@ def send_to_influxdb(water):
     data = "%s,device=%s water=%.1f" % (secrets['measurement'], client_id, water)
     response = https.post(url, headers=headers, data=data)
     if '204' in str(response.status_code):  # HTTP Status 204 (No Content) indicates server fulfilled request
-        print(f'DB: {secrets['database']} \t Measurement: {data} \t Status: {response.status_code} Success')
+        print(f'InfluxDB: {secrets['database']} \t Measurement: {data} \t Status: {response.status_code} Success')
     else:
-        print(f'DB: {secrets['database']} \t Measurement: {data} \t Status: {response.status_code} Failed')
+        print(f'InfluxDB: {secrets['database']} \t Measurement: {data} \t Status: {response.status_code} Failed')
 
 
 ###################################
@@ -222,10 +214,11 @@ def main():
     image_buffer.append(draw_background_color(width=DISPLAY_WIDTH, height=DISPLAY_HEIGHT, color=0xffffff))
     image_buffer.append(draw_image('/pool.bmp', x=0, y=0))
     if air:
-        image_buffer.append(draw_text(string=str(air), scale=1, x=air_digits(air), y=50, color=0x000000, font='/GothamBlack-54.bdf'))
-        image_buffer.append(draw_text(string='Air', scale=1, x=40, y=95, color=0x000000, font='/GothamBlack-25.bdf'))
-    image_buffer.append(draw_text(string=str(water), scale=1, x=14, y=185, color=0x000000, font='/GothamBlack-54.bdf'))
-    image_buffer.append(draw_text(string='Water', scale=1, x=20, y=231, color=0x000000, font='/GothamBlack-25.bdf'))
+        image_buffer.append(draw_text(string=str(air), scale=1, x='center', y=50, color=0x000000, font='/GothamBlack-54.bdf', display_width=DISPLAY_WIDTH))
+        image_buffer.append(draw_text(string='Air', scale=1, x='center', y=95, color=0x000000, font='/GothamBlack-25.bdf', display_width=DISPLAY_WIDTH))
+    if water:
+        image_buffer.append(draw_text(string=str(water), scale=1, x='center', y=185, color=0x000000, font='/GothamBlack-54.bdf', display_width=DISPLAY_WIDTH))
+        image_buffer.append(draw_text(string='Water', scale=1, x='center', y=231, color=0x000000, font='/GothamBlack-25.bdf', display_width=DISPLAY_WIDTH))
     display.show(image_buffer)
     display.refresh()  # NOTE: Do not refresh eInk displays more often than 180 seconds!
     
@@ -252,4 +245,3 @@ while True:
         sleep(sleep_interval)
         from supervisor import reload
         reload()  # Soft-Reset
-
