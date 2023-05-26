@@ -82,16 +82,20 @@ led(0)
 ###################################
 # Initialize Wifi
 ###################################
-wifi.radio.connect(secrets["ssid"], secrets["password"])
+try:
+    wifi.radio.connect(secrets['ssid'], secrets['password'])
+except Exception as e:
+    print('ERROR: No Wifi Connection:', e)
+    pass # No wifi
+
 pool = socketpool.SocketPool(wifi.radio)
 ntp = adafruit_ntp.NTP(pool, tz_offset=-5)
-
 
 ###################################
 # Initialize HTTPS
 ###################################
 https = adafruit_requests.Session(pool, ssl.create_default_context())
-JSON_URL = "https://api.openweathermap.org/data/2.5/weather?lat=" + secrets['lat'] + "&lon=" + secrets['lon'] + "&units=imperial&appid=" + secrets['appid']
+JSON_URL = 'https://api.openweathermap.org/data/2.5/weather?lat=' + secrets['lat'] + '&lon=' + secrets['lon'] + '&units=imperial&appid=' + secrets['appid']
 
 
 ###################################
@@ -189,12 +193,16 @@ def main():
     try:
         air = air_reading()
     except Exception as e:
-        print('ERROR:', e)
+        print('ERROR: No Air Reading:', e)
         air = None
     water = water_reading()
     
     # Send Water Reading to InfluxDB
-    send_to_influxdb(water)
+    try:
+        send_to_influxdb(water)
+    except Exception as e:
+        print('ERROR: Failed to connect to InfluxDB server:', e)
+        pass
     
     # Update Display Only if Readings have Changed
     air = None if air is None else int(roundTraditional(air,0))
