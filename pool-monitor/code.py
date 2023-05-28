@@ -1,4 +1,28 @@
+# Brandon Gant
+# Created: 2023-05-19
+# Updated: 2023-05-28
 
+'''Parts List:
+    * Raspberry Pi Pico W
+      https://www.adafruit.com/product/5526
+      https://www.sparkfun.com/products/20173
+      https://www.pishop.us/product/raspberry-pi-pico-w/
+
+    * Adafruit 2.13" Tri-Color eInk Display Breakout
+      https://www.adafruit.com/product/4947
+
+    * Adafruit Universal Thermocouple Amplifier MAX31856 Breakout
+      https://www.adafruit.com/product/3263
+
+    * Waterproof Stainless Steel K-Type Thermocouple
+      https://www.amazon.com/dp/B07PNTDFGJ
+
+    * qBoxMini DIY IOT Enclosure Kit
+      https://www.amazon.com/dp/B088CRR7KS
+
+    * Sutemribor M2.5 Hex Brass Standoff Assortment Kit
+      https://www.amazon.com/product/B075K3QBMX
+'''
 
 '''secrets.py
 secrets = {
