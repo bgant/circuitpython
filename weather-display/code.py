@@ -1,7 +1,7 @@
 '''
 Brandon Gant
 Created: 2021-02-24
-Updated: 2021-04-20
+Updated: 2024-04-10
 
 Unexpected Maker FeatherS2:
     https://feathers2.io/
@@ -167,6 +167,7 @@ import ipaddress
 import ssl
 import wifi
 import socketpool
+import json
 import adafruit_requests    # Copy adafruit_requests.mpy from Bundle to /lib/
 try:
     from secrets import secrets # Create secrets.py file with key:value pairs (see note above)
@@ -174,15 +175,25 @@ except:
     print("You need to create a secrets.py file... See comments at the top of this script.")
 
 try:
-    JSON_URL = "https://api.openweathermap.org/data/2.5/onecall?lat=" + secrets['lat'] + "&lon=" + secrets['lon'] + "&units=imperial&exclude=minutely&appid=" + secrets['appid']
     wifi.radio.enabled = True
     wifi.radio.connect(secrets["ssid"], secrets["password"])
     pool = socketpool.SocketPool(wifi.radio)
-    https = adafruit_requests.Session(pool, ssl.create_default_context())
-    response = https.get(JSON_URL)
-    json_data = response.json()
+    
+    ### Direct Request to OpenWeatherMap API
+    #JSON_URL = "https://api.openweathermap.org/data/2.5/onecall?lat=" + secrets['lat'] + "&lon=" + secrets['lon'] + "&units=imperial&exclude=minutely&appid=" + secrets['appid']
+    #https = adafruit_requests.Session(pool, ssl.create_default_context())
+    #response = https.get(JSON_URL)
+    #json_data = response.json()
+    
+    ### Request to local Webdis server
+    URL = f'http://{secrets["webdis_host"]}:{secrets["webdis_port"]}/GET/{secrets["webdis_key"]}'
+    http = adafruit_requests.Session(pool)
+    response = http.get(URL)
+    webdis_data = response.json()
+    json_data = json.loads(webdis_data['GET'])  # Webdis adds a GET field at the beginning
+    
     response.close()
-    wifi.radio.enabled = False  # Turning wifi off to conserve battery
+    #wifi.radio.enabled = False  # Turning wifi off to conserve battery
 
     # Draw Icon Image
     icon = str(json_data['current']['weather'][0]['icon'])
@@ -247,12 +258,12 @@ except:
     current_minute = 0
 print("Current Time: %02d:%02d" % (current_hour,current_minute))
 # Set the Deep Sleep Alarm
-if current_hour > 20 or current_hour < 6:
+if current_hour > 24 or current_hour < 0:  # Effectively disabled since we are using Webdis now
     print("Setting Deep Sleep Alarm for 1 Hour")
     time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 3600)  # Sleep 1 hour 
 else:
-    print("Setting Deep Sleep Alarm for 10 Minutes")
-    time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 600)   # Sleep 10 Minutes
+    print("Setting Deep Sleep Alarm for 5 Minutes")
+    time_alarm = alarm.time.TimeAlarm(monotonic_time=monotonic() + 300)   # Sleep 5 Minutes
 # Deep sleep until the alarm goes off then restart the program
 alarm.exit_and_deep_sleep_until_alarms(time_alarm)
 
