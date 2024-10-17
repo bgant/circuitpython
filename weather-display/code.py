@@ -1,7 +1,7 @@
 '''
 Brandon Gant
 Created: 2021-02-24
-Updated: 2024-04-10
+Updated: 2024-10-16
 
 Unexpected Maker FeatherS2:
     https://feathers2.io/
@@ -19,9 +19,7 @@ Libraries used by this script copied to CIRCUITPY/lib/
     adafruit_display_text/ 
     adafruit_requests.mpy
 
-OpenWeatherMap images:
-   https://openweathermap.org/weather-conditions
-   Convert PNG image to BMP example:
+Convert PNG image to BMP example:
      * Open 01d@2x.png image in Gimp
      * Set 'Paint Fill' to ABADB0 (Light Grey)
      * Paint Fill the clear background 
@@ -57,7 +55,7 @@ BACKGROUND = LIGHT_GREY
 forecast_location = {'x':5, 'y':23}
 
 # Image and Temp Block Location
-temp_location = {'x':200, 'y':12}
+temp_location = {'x':202, 'y':12}
 
 
 #----------------------------------------------------------------
@@ -196,46 +194,62 @@ try:
     #wifi.radio.enabled = False  # Turning wifi off to conserve battery
 
     # Draw Icon Image
-    icon = str(json_data['current']['weather'][0]['icon'])
-    if '01d' in icon:
-        icon = 'sun'
-    elif '01n' in icon:
-        icon = 'moon'
-    else:
-        icon = icon[:-1]  # Strip off the 'd' or 'n'
+    icon_url = str(json_data['properties']['periods'][0]['icon'])  # URL string for icon
+    #icon_url = "https://api.weather.gov/icons/land/night/tsra?size=small"  # Uncomment for testing
+    icon_dict = {'02':['few','sct','wind_few','wind_sct'],  # Cloud with Sun
+                  '04':['bkn','ovc','wind_bkn','wind_ovc'],  # Cloudy
+                  '10':['rain_showers','rain_showers_hi'],   # Light Rain
+                  '09':['rain','rain_snow','rain_sleet','fzra','rain_fzra','sleet','tropical_storm'],  # Rain
+                  '13':['snow','show_sleet','snow_fzra','blizzard'],  # Snow
+                  '11':['tsra','tsra_sct','tsra_hi'],        # Thunderstorm
+                  '50':['dust','smoke','haze','fog'],        # Hard to see
+                  }
+    icon_image = None
+    for image_number, weather in icon_dict.items():
+        if icon_image:
+            break
+        icon_image = image_number if any(x in icon_url for x in weather) else None
+    if not icon_image:
+        icon_image = 'sun' if 'day' in icon_url else 'moon'
     #icon = '11'  # Test Options: sun moon 02 03 04 09 10 11 13 50
-    image = "/icons/" + icon + ".bmp"
+    image = "/icons/" + icon_image + ".bmp"
     draw_image(image=image, x=temp_location['x'], y=temp_location['y'])
 
     # Draw Current Temperature
-    temp = str(round(json_data['current']['temp'])) + chr(176)
+    temp = str(round(json_data['properties']['periods'][0]['temperature'])) + chr(176)
     print("Current Temp:", temp)
-    draw_text(text=temp,scale=3,x=temp_location['x'] + 34,y=temp_location['y'] + 3,color=BLACK)
-
-    # Draw "Feels Like" Temperature
-    feels_like = str(round(json_data['current']['feels_like'])) + chr(176)
-    draw_text(text='feels like',scale=1,x=temp_location['x'] + 20,y=temp_location['y'] + 85,color=BLACK)
-    draw_text(text=feels_like,scale=2,x=temp_location['x'] + 38,y=temp_location['y'] + 100,color=BLACK)
+    draw_text(text=temp,scale=3,x=temp_location['x'] + 36,y=temp_location['y'] + 3,color=BLACK)
 
     # Draw hourly forecast
-    from time import localtime
     forecast_y = forecast_location['y']
     for i in range(0,5):
         # Draw Hour
         forecast_x = forecast_location['x']
-        hour_24 = localtime(json_data['hourly'][i]['dt'] + json_data['timezone_offset']).tm_hour 
-        (hour_string, forecast_x) = convert_hour(hour_24, forecast_x)   # Convert from 24-hour to 12-hour AM/PM format
+        hour_24 = int(str(json_data['properties']['periods'][i]['startTime'])[11:-12:])
+        hour_string, forecast_x = convert_hour(hour_24, forecast_x)   # Convert from 24-hour to 12-hour AM/PM format
         draw_text(text=hour_string,scale=1,x=forecast_x,y=forecast_y,color=BLACK)
 
         # Draw Description
-        description = str(json_data['hourly'][i]['weather'][0]['description'])
+        description = str(json_data['properties']['periods'][i]['shortForecast'])
         #description = 'thunderstorm with heavy drizzle'  # Longest text string
         draw_text(text=description,scale=1,x=forecast_location['x'] + 33,y=forecast_y,color=BLACK)
         
         # Shift down for next hourly forecast line
         forecast_y += 20
-except:
-    print("ERROR")
+        
+    # Draw "Feels Like" Temperature
+    URL = f'http://{secrets["webdis_host"]}:{secrets["webdis_port"]}/GET/nws-feelslike'
+    http = adafruit_requests.Session(pool)
+    response = http.get(URL)
+    webdis_data = response.json()
+    json_data = json.loads(webdis_data['GET'])  # Webdis adds a GET field at the beginning
+    response.close()
+    feels_like = str(json_data) + chr(176)
+    draw_text(text='feels like',scale=1,x=temp_location['x'] + 20,y=temp_location['y'] + 85,color=BLACK)
+    draw_text(text=feels_like,scale=2,x=temp_location['x'] + 40,y=temp_location['y'] + 100,color=BLACK)
+
+except Exception as e:
+    print("ERROR", e)
     pass
 
 # Push Image to the Display
@@ -256,7 +270,7 @@ try:
 except:
     current_hour = 12
     current_minute = 0
-print("Current Time: %02d:%02d" % (current_hour,current_minute))
+#print("Current Time: %02d:%02d" % (current_hour,current_minute))
 # Set the Deep Sleep Alarm
 if current_hour > 24 or current_hour < 0:  # Effectively disabled since we are using Webdis now
     print("Setting Deep Sleep Alarm for 1 Hour")
