@@ -156,6 +156,14 @@ def convert_hour(hour_24=12, forecast_x=4):
             forecast_x += 6  # Line up single and double digit numbers
     return (hour_string, forecast_x)
 
+#----------------------------------------------------------------
+# Rounding like you learned in Math
+#----------------------------------------------------------------
+
+def roundTraditional(val,digits):
+    '''Rounding like you learned in Math'''
+    return round(val+10**(-len(str(val))-1), digits)
+
 
 #----------------------------------------------------------------
 # Main Code Block
@@ -244,7 +252,8 @@ try:
     webdis_data = response.json()
     json_data = json.loads(webdis_data['GET'])  # Webdis adds a GET field at the beginning
     response.close()
-    feels_like = str(json_data) + chr(176)
+    #feels_like = str(json_data) + chr(176)
+    feels_like = str(int(roundTraditional(float(json_data),0))) + chr(176)
     draw_text(text='feels like',scale=1,x=temp_location['x'] + 20,y=temp_location['y'] + 85,color=BLACK)
     draw_text(text=feels_like,scale=2,x=temp_location['x'] + 40,y=temp_location['y'] + 100,color=BLACK)
 
